@@ -6,11 +6,11 @@ import org.itheima.kotlin.game.core.Painter
 /**
  * 砖墙
  */
-class Wall(override val width: Int, override val height: Int) : View {
-//    override val width: Int = Config.block
-//    override val height: Int = Config.block
-    override val x: Int = 100
-    override val y: Int = 100
+class Wall(override val x: Int, override val y: Int) : View {
+    override val width: Int = Config.block
+    override val height: Int = Config.block
+//    override val x: Int = 100
+//    override val y: Int = 100
 
     override fun draw() {
         Painter.drawImage("img/wall.gif", x, y)
