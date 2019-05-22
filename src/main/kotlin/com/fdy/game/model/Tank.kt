@@ -5,7 +5,7 @@ import com.fdy.game.enum.Direction
 import org.itheima.kotlin.game.core.Painter
 
 
-class Tank(override val x: Int, override val y: Int) : View {
+class Tank(override var x: Int, override var y: Int) : View {
     override val width: Int = Config.block
     override val height: Int = Config.block
     //方向
@@ -33,9 +33,16 @@ class Tank(override val x: Int, override val y: Int) : View {
 
     /**
      * 移动
+     * @param direction 方向
      */
     fun move(direction: Direction){
         this.currentDirection=direction
-
+        //坦克的坐标需要发生变化
+        when(direction){
+//            Direction.UP-> y-=
+//            Direction.DOWN->
+//            Direction.LEFT->
+//            Direction.RIGHT->
+        }
     }
 }
