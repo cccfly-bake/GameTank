@@ -1,12 +1,13 @@
 package com.fdy.game.model
 
 import com.fdy.game.Config
+import com.fdy.game.business.Blockable
 import org.itheima.kotlin.game.core.Painter
 
 /**
  * 水
  */
-class Water(override val x: Int, override val y: Int) :View {
+class Water(override val x: Int, override val y: Int) :Blockable {
     //位置
 //    override var x: Int = 200
 //    override var y: Int = 200

@@ -1,5 +1,7 @@
 package com.fdy.game
 
+import com.fdy.game.business.Blockable
+import com.fdy.game.business.Movable
 import com.fdy.game.enum.Direction
 import com.fdy.game.model.*
 import javafx.scene.input.KeyCode
@@ -69,10 +71,57 @@ class GameWindow : Window(
             KeyCode.D -> {
                 tank.move(Direction.RIGHT)
             }
+            KeyCode.ENTER -> {
+                //发射子弹
+                val short = tank.short()
+                views.add(short)
+            }
         }
     }
 
     override fun onRefresh() {
+        //业务逻辑
+
+        //判断运动的物体和阻塞的物体是否发生碰撞
+        //1.找到运动的物体
+//        val moves = views.filter { it is Movable }
+//        //2.找到阻塞的物体
+//        val blocks = views.filter { it is Blockable }
+//        //3 遍历集合 找到是否发生碰撞
+        //1.找到运动的物体
+        views.filter { it is Movable }.forEach moveTag@{ move ->
+            //        //2.找到阻塞的物体
+            move as Movable
+            var badDirection: Direction? = null
+            var badBlockable: Blockable? = null
+            views.filter { it is Blockable }.forEach blockTag@{ block ->
+                //        //3 遍历集合 找到是否发生碰撞
+                //move和block是否碰撞
+                block as Blockable
+                //获得碰撞的方向
+                val direction = move.willCollsion(block)
+                //碰撞的方向不为空执行let表达式
+                direction?.let {
+                    //移动的发生碰撞,跳出当前循环
+                    badDirection = direction
+                    badBlockable = block
+                    return@blockTag
+                }
+            }
+
+            //找到和move碰撞的block
+            //找到会碰撞的方向
+            //通知可以移动的物体会在哪个和哪个物体碰撞
+            move.notifyCollsion(badDirection, badBlockable)
+        }
+
     }
+
+}
+
+/**
+ * 发射子弹
+ */
+fun Tank.short() {
 
 }

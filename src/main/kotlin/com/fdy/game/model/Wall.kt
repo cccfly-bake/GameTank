@@ -1,12 +1,13 @@
 package com.fdy.game.model
 
 import com.fdy.game.Config
+import com.fdy.game.business.Blockable
 import org.itheima.kotlin.game.core.Painter
 
 /**
- * 砖墙
+ * 砖墙 具备阻塞能力
  */
-class Wall(override val x: Int, override val y: Int) : View {
+class Wall(override val x: Int, override val y: Int) : Blockable {
     override val width: Int = Config.block
     override val height: Int = Config.block
 //    override val x: Int = 100
