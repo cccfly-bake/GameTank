@@ -101,7 +101,7 @@ class Tank(override var x: Int, override var y: Int) : Movable {
     }
 
     fun short(): Bullet {
-        return Bullet(currentDirection) {bulletWidth,bulletHeight->
+        return Bullet(currentDirection) { bulletWidth, bulletHeight ->
             val tankX = x
             val tankY = y
             val tankWidth = width
@@ -113,15 +113,27 @@ class Tank(override var x: Int, override var y: Int) : Movable {
             var bulletX = 0
             var bulletY = 0
             var bulletwidth = 0//不写死,由子弹自身决定
-            var bulletHeifht = 0//不写死,由子弹自身决定
+            var bulletHeight = 0//不写死,由子弹自身决定
             when (currentDirection) {
                 Direction.UP -> {
                     bulletX = tankX + (tankWidth - bulletwidth) / 2
-                    bulletY = tankY - bulletHeifht / 2
+                    bulletY = tankY + bulletHeight / 2
+                }
+                Direction.DOWN -> {
+                    bulletX = tankX + (tankWidth - bulletwidth) / 2
+                    bulletY = tankY + tankHeight - bulletHeight / 2
+                }
+                Direction.LEFT -> {
+                    bulletX = tankX + bulletwidth / 2
+                    bulletY = tankY + (tankHeight - bulletHeight) / 2
+                }
+                Direction.RIGHT -> {
+                    bulletX = tankX + tankWidth - bulletwidth / 2
+                    bulletY = tankY + (tankHeight - bulletHeight) / 2
                 }
 
             }
-            Pair(bulletX,bulletY)
+            Pair(bulletX, bulletY)
         }
     }
 

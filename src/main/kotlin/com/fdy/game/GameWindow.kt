@@ -1,13 +1,13 @@
 package com.fdy.game
 
-import com.fdy.game.business.Blockable
-import com.fdy.game.business.Movable
+import com.fdy.game.business.*
 import com.fdy.game.enum.Direction
 import com.fdy.game.model.*
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import org.itheima.kotlin.game.core.Window
 import java.io.File
+import java.util.concurrent.CopyOnWriteArrayList
 
 class GameWindow : Window(
     title = "坦克大战1.0",
@@ -16,7 +16,10 @@ class GameWindow : Window(
     height = Config.gameHeight
 ) {
     //管理元素的集合
-    private var views = arrayListOf<View>()
+//    private var views = arrayListOf<View>()
+    //线程安全的集合
+    private var views = CopyOnWriteArrayList<View>()
+
     //晚点创建 我方坦克
     private lateinit var tank: Tank
 
@@ -54,6 +57,8 @@ class GameWindow : Window(
         views.forEach {
             it.draw()
         }
+        //打印界面中的元素
+        println("${views.size}")
     }
 
     override fun onKeyPressed(event: KeyEvent) {
@@ -89,6 +94,7 @@ class GameWindow : Window(
 //        val blocks = views.filter { it is Blockable }
 //        //3 遍历集合 找到是否发生碰撞
         //1.找到运动的物体
+
         views.filter { it is Movable }.forEach moveTag@{ move ->
             //        //2.找到阻塞的物体
             move as Movable
@@ -113,6 +119,38 @@ class GameWindow : Window(
             //找到会碰撞的方向
             //通知可以移动的物体会在哪个和哪个物体碰撞
             move.notifyCollsion(badDirection, badBlockable)
+        }
+
+        //检测自动移动能力的物体,让他们自己动起来
+        views.filter {
+            it is AutoMovable
+        }.forEach {
+            (it as AutoMovable).autoMove()
+        }
+        //检测是否销毁的物体
+        views.filter {
+            it is Destroyable
+        }.forEach {
+            if ((it as Destroyable).isDestroyable()) {
+                views.remove(it)
+            }
+        }
+        //检测具备攻击能力和被攻击能力的物体间是否发生碰撞
+        //过滤出具备攻击能力的物体
+        views.filter { it is Attackable }.forEach attackTag@ {attack->
+            attack as Attackable
+            //过滤出具备受攻击能力的物体
+            views.filter { it is Sufferable }.forEach sufferTag@ {suffer->
+                //判断是否发生碰撞
+                suffer as Sufferable
+                if (attack.isCollision(suffer)){
+                    //通知我们对应的攻击者产生我们的碰撞
+                    attack.notifyAttack(suffer)
+                    //通知我们的被攻击者产生碰撞
+                    suffer.notifySuffer(attack)
+                    return@sufferTag
+                }
+            }
         }
 
     }
