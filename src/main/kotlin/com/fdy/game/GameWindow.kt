@@ -144,6 +144,7 @@ class GameWindow : Window(
                 //判断是否发生碰撞
                 suffer as Sufferable
                 if (attack.isCollision(suffer)){
+                    //产生碰撞,找到碰撞者
                     //通知我们对应的攻击者产生我们的碰撞
                     attack.notifyAttack(suffer)
                     //通知我们的被攻击者产生碰撞

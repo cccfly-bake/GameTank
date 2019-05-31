@@ -1,9 +1,12 @@
 package com.fdy.game.model
 
 import com.fdy.game.Config
+import com.fdy.game.business.Attackable
 import com.fdy.game.business.AutoMovable
 import com.fdy.game.business.Destroyable
+import com.fdy.game.business.Sufferable
 import com.fdy.game.enum.Direction
+import com.fdy.game.ext.checkCollision
 import org.itheima.kotlin.game.core.Painter
 
 /**
@@ -12,12 +15,14 @@ import org.itheima.kotlin.game.core.Painter
  */
 class Bullet(
     override val currentDirection: Direction, create: (width: Int, height: Int) -> Pair<Int, Int>
-    ) : AutoMovable ,Destroyable{
+) : AutoMovable, Destroyable, Attackable {
+    override val attackPower: Int=1
     override val speed: Int = 8
     override var x: Int = 0
     override var y: Int = 0
     override val width: Int
     override val height: Int
+    private var isDestroy: Boolean = false
     private var imagePath: String = when (currentDirection) {
         Direction.UP -> "img/shot_top.gif"
         Direction.DOWN -> "img/shot_bottom.gif"
@@ -49,20 +54,34 @@ class Bullet(
             Direction.RIGHT -> x += speed
         }
     }
+
     override fun isDestroyable(): Boolean {
+        if (isDestroy) {
+            return true
+        }
         //子弹在脱离了屏幕后 需要被销毁
-        if (x<-width){
+        if (x < -width) {
             return true
         }
-        if (x>Config.gameWidth){
+        if (x > Config.gameWidth) {
             return true
         }
-        if (y<-height){
+        if (y < -height) {
             return true
         }
-        if (y>Config.gameHeight){
+        if (y > Config.gameHeight) {
             return true
         }
         return false
+    }
+
+    override fun isCollision(sufferable: Sufferable): Boolean {
+        return checkCollision(sufferable)
+    }
+
+    override fun notifyAttack(sufferable: Sufferable) {
+        println("子弹接受到我们的碰撞")
+        isDestroy = true
+        //子弹打到墙上后,需要被销毁掉
     }
 }
