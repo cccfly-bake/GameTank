@@ -41,6 +41,7 @@ class GameWindow : Window(
                     '水' -> views.add(Water(columnNum * Config.block, lineNum * Config.block))
                     '铁' -> views.add(Steel(columnNum * Config.block, lineNum * Config.block))
                     '草' -> views.add(Grass(columnNum * Config.block, lineNum * Config.block))
+                    '敌' -> views.add(Enemy(columnNum * Config.block, lineNum * Config.block))
                 }
                 columnNum++
             }
@@ -94,13 +95,13 @@ class GameWindow : Window(
 //        val blocks = views.filter { it is Blockable }
 //        //3 遍历集合 找到是否发生碰撞
         //1.找到运动的物体
-
         views.filter { it is Movable }.forEach moveTag@{ move ->
             //        //2.找到阻塞的物体
             move as Movable
             var badDirection: Direction? = null
             var badBlockable: Blockable? = null
-            views.filter { it is Blockable }.forEach blockTag@{ block ->
+            //不要和自己比较,碰撞
+            views.filter { (it is Blockable) and (move != it) }.forEach blockTag@{ block ->
                 //        //3 遍历集合 找到是否发生碰撞
                 //move和block是否碰撞
                 block as Blockable
@@ -137,23 +138,35 @@ class GameWindow : Window(
         }
         //检测具备攻击能力和被攻击能力的物体间是否发生碰撞
         //过滤出具备攻击能力的物体
-        views.filter { it is Attackable }.forEach attackTag@ {attack->
+        views.filter { it is Attackable }.forEach attackTag@{ attack ->
             attack as Attackable
             //过滤出具备受攻击能力的物体
-            views.filter { it is Sufferable }.forEach sufferTag@ {suffer->
+            views.filter { it is Sufferable }.forEach sufferTag@{ suffer ->
                 //判断是否发生碰撞
                 suffer as Sufferable
-                if (attack.isCollision(suffer)){
+                if (attack.isCollision(suffer)) {
                     //产生碰撞,找到碰撞者
                     //通知我们对应的攻击者产生我们的碰撞
                     attack.notifyAttack(suffer)
                     //通知我们的被攻击者产生碰撞
-                    suffer.notifySuffer(attack)
+                    val sufferView: Array<View>? = suffer.notifySuffer(attack)
+                    sufferView?.let {
+                        //产生挨打的效果
+                        views.addAll(sufferView)
+                    }
                     return@sufferTag
                 }
             }
         }
 
+        //检测自动射击
+        views.filter { it is AutoShot }.forEach {
+            it as AutoShot
+            val shot=it.autoShot()
+            shot?.let {
+                views.add(shot)
+            }
+        }
     }
 
 }

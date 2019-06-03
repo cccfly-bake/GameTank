@@ -75,31 +75,31 @@ class Tank(override var x: Int, override var y: Int) : Movable {
         this.badDirection = direction
     }
 
-    override fun willCollsion(blockable: Blockable): Direction? {
-        //将要碰撞时做判断
-        //坦克的坐标需要发生变化
-        var x: Int = this.x
-        var y: Int = this.y
-        when (currentDirection) {
-            Direction.UP -> y -= speed
-            Direction.DOWN -> y += speed
-            Direction.LEFT -> x -= speed
-            Direction.RIGHT -> x += speed
-        }
-        ///todo 监测碰撞
-        //阻挡物在运动物上放 不发生碰撞
-//        val collistion: Boolean = when {
-//            blockable.y + blockable.height <= y -> //阻挡物再运动物上方
-//                false
-//            y + height <= blockable.y -> //阻挡物在运动无下方
-//                false
-//            blockable.x + blockable.width <= x -> //阻挡物在运动物的左方
-//                false
-//            else -> x + width > blockable.x
+//    override fun willCollsion(blockable: Blockable): Direction? {
+//        //将要碰撞时做判断
+//        //坦克的坐标需要发生变化
+//        var x: Int = this.x
+//        var y: Int = this.y
+//        when (currentDirection) {
+//            Direction.UP -> y -= speed
+//            Direction.DOWN -> y += speed
+//            Direction.LEFT -> x -= speed
+//            Direction.RIGHT -> x += speed
 //        }
-        return if (checkCollision(blockable.x,blockable.y,blockable.width,blockable.height,
-                x,y,width,height)) currentDirection else null
-    }
+//        ///todo 监测碰撞
+//        //阻挡物在运动物上放 不发生碰撞
+////        val collistion: Boolean = when {
+////            blockable.y + blockable.height <= y -> //阻挡物再运动物上方
+////                false
+////            y + height <= blockable.y -> //阻挡物在运动无下方
+////                false
+////            blockable.x + blockable.width <= x -> //阻挡物在运动物的左方
+////                false
+////            else -> x + width > blockable.x
+////        }
+//        return if (checkCollision(blockable.x,blockable.y,blockable.width,blockable.height,
+//                x,y,width,height)) currentDirection else null
+//    }
 
     fun short(): Bullet {
         return Bullet(currentDirection) { bulletWidth, bulletHeight ->

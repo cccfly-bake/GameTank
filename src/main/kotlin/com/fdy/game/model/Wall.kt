@@ -5,6 +5,7 @@ import com.fdy.game.business.Attackable
 import com.fdy.game.business.Blockable
 import com.fdy.game.business.Destroyable
 import com.fdy.game.business.Sufferable
+import org.itheima.kotlin.game.core.Composer
 import org.itheima.kotlin.game.core.Painter
 
 /**
@@ -31,10 +32,13 @@ class Wall(override val x: Int, override val y: Int) : Blockable, Sufferable, De
 //        Painter.drawImage("img/wall.gif", x, y)
 //    }
 
-    override fun notifySuffer(attackable: Attackable) {
+    override fun notifySuffer(attackable: Attackable):Array<View>? {
         println("砖墙接受到挨打了")
         //砖墙需要掉血
         blood -= attackable.attackPower
+        //喊疼,播放声音
+        Composer.play("snd/hit.wav")
+        return arrayOf(Blast(x,y))
     }
 
     override fun isDestroyable(): Boolean = blood <= 0

@@ -10,5 +10,8 @@ interface Sufferable:View {
      * 生命值
      */
     val blood:Int
-    fun notifySuffer(attackable: Attackable)
+
+    fun notifySuffer(attackable: Attackable):Array<View>?
+
+
 }
