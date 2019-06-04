@@ -1,17 +1,22 @@
 package com.fdy.game.model
 
 import com.fdy.game.Config
+import com.fdy.game.business.Attackable
 import com.fdy.game.business.Blockable
 import com.fdy.game.business.Movable
+import com.fdy.game.business.Sufferable
 import com.fdy.game.enum.Direction
 import org.itheima.kotlin.game.core.Painter
 
 /**
  * 坦克  具备移动能力
+ * 具备阻挡能力
  */
-class Tank(override var x: Int, override var y: Int) : Movable {
-
-
+class Tank(override var x: Int, override var y: Int) : Movable, Blockable, Sufferable{
+    /**
+     * 血量
+     */
+    override var blood: Int=20
     override val width: Int = Config.block
     override val height: Int = Config.block
     //方向
@@ -102,7 +107,7 @@ class Tank(override var x: Int, override var y: Int) : Movable {
 //    }
 
     fun short(): Bullet {
-        return Bullet(currentDirection) { bulletWidth, bulletHeight ->
+        return Bullet(this,currentDirection) { bulletWidth, bulletHeight ->
             val tankX = x
             val tankY = y
             val tankWidth = width
@@ -138,4 +143,8 @@ class Tank(override var x: Int, override var y: Int) : Movable {
         }
     }
 
+    override fun notifySuffer(attackable: Attackable): Array<View>? {
+        blood-=attackable.attackPower
+        return  arrayOf(Blast(x,y))
+    }
 }

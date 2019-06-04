@@ -51,6 +51,9 @@ class GameWindow : Window(
         //添加我方坦克
         tank = Tank(Config.block * 10, Config.block * 12)
         views.add(tank)
+
+        //添加我方大本营
+        views.add(Camp(Config.gameWidth / 2 - Config.block, Config.gameHeight - 96))
     }
 
     override fun onDisplay() {
@@ -140,8 +143,8 @@ class GameWindow : Window(
         //过滤出具备攻击能力的物体
         views.filter { it is Attackable }.forEach attackTag@{ attack ->
             attack as Attackable
-            //过滤出具备受攻击能力的物体
-            views.filter { it is Sufferable }.forEach sufferTag@{ suffer ->
+            //过滤出具备受攻击能力的物体,攻击方的来源不可以是发射方
+            views.filter { (it is Sufferable) and (attack.owner != it) }.forEach sufferTag@{ suffer ->
                 //判断是否发生碰撞
                 suffer as Sufferable
                 if (attack.isCollision(suffer)) {
@@ -162,7 +165,7 @@ class GameWindow : Window(
         //检测自动射击
         views.filter { it is AutoShot }.forEach {
             it as AutoShot
-            val shot=it.autoShot()
+            val shot = it.autoShot()
             shot?.let {
                 views.add(shot)
             }

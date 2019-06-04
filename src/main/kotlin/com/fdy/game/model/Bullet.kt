@@ -14,7 +14,9 @@ import org.itheima.kotlin.game.core.Painter
  * 闭包方式创建
  */
 class Bullet(
+    override val owner: View,
     override val currentDirection: Direction, create: (width: Int, height: Int) -> Pair<Int, Int>
+
 ) : AutoMovable, Destroyable, Attackable {
     override val attackPower: Int=1
     override val speed: Int = 8
