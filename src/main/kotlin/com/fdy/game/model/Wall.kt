@@ -12,6 +12,10 @@ import org.itheima.kotlin.game.core.Painter
  * 砖墙 具备阻塞能力
  */
 class Wall(override val x: Int, override val y: Int) : Blockable, Sufferable, Destroyable {
+    override fun showDestroy(): Array<View>? {
+        return null
+    }
+
     override var blood: Int = 3
     override val width: Int = Config.block
     override val height: Int = Config.block

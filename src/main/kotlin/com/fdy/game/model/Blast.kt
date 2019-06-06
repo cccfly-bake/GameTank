@@ -9,6 +9,9 @@ import org.itheima.kotlin.game.core.Painter
  * 爆炸物
  */
 class Blast(override val x: Int, override val y: Int) : Destroyable {
+    override fun showDestroy(): Array<View>? {
+        return null
+    }
 
 
     override val width: Int = Config.block

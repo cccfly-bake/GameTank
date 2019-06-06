@@ -3,6 +3,7 @@ package com.fdy.game.model
 import com.fdy.game.Config
 import com.fdy.game.business.Attackable
 import com.fdy.game.business.Blockable
+import com.fdy.game.business.Destroyable
 import com.fdy.game.business.Sufferable
 import org.itheima.kotlin.game.core.Painter
 
@@ -10,8 +11,9 @@ import org.itheima.kotlin.game.core.Painter
  * 大本营
  * 具备阻挡功能
  * 具备挨打功能
+ * 具备销毁功能
  */
-class Camp(override var x: Int, override var y: Int) : Blockable, Sufferable {
+class Camp(override var x: Int, override var y: Int) : Blockable, Sufferable, Destroyable {
     override var blood: Int = 12
     override var width: Int = Config.block * 2
     override var height: Int = Config.block + 32
@@ -63,5 +65,23 @@ class Camp(override var x: Int, override var y: Int) : Blockable, Sufferable {
         } else {
             return null
         }
+    }
+
+    override fun isDestroyable(): Boolean = blood <= 0
+
+    override fun showDestroy(): Array<View>? {
+        return arrayOf(
+            Blast(x - 32, y - 32),
+            Blast(x, y - 32),
+            Blast(x + 32, y - 32),
+
+            Blast(x - 32, y),
+            Blast(x, y),
+            Blast(x + 32, y),
+
+            Blast(x - 32, y + 32),
+            Blast(x, y + 32),
+            Blast(x + 32, y + 32)
+        )
     }
 }

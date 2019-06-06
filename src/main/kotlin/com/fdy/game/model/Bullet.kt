@@ -18,6 +18,10 @@ class Bullet(
     override val currentDirection: Direction, create: (width: Int, height: Int) -> Pair<Int, Int>
 
 ) : AutoMovable, Destroyable, Attackable {
+    override fun showDestroy(): Array<View>? {
+        return null
+    }
+
     override val attackPower: Int=1
     override val speed: Int = 8
     override var x: Int = 0

@@ -22,6 +22,10 @@ class GameWindow : Window(
 
     //晚点创建 我方坦克
     private lateinit var tank: Tank
+    /**
+     * 游戏是否结束
+     */
+    private var gameOver: Boolean = false
 
     override fun onCreate() {
         //地图
@@ -67,29 +71,47 @@ class GameWindow : Window(
 
     override fun onKeyPressed(event: KeyEvent) {
         //根据案件wsad移动坦克   更改xy去移动坦克
-        when (event.code) {
-            KeyCode.W -> {
-                tank.move(Direction.UP)
-            }
-            KeyCode.S -> {
-                tank.move(Direction.DOWN)
-            }
-            KeyCode.A -> {
-                tank.move(Direction.LEFT)
-            }
-            KeyCode.D -> {
-                tank.move(Direction.RIGHT)
-            }
-            KeyCode.ENTER -> {
-                //发射子弹
-                val short = tank.short()
-                views.add(short)
+        if (!gameOver){
+            when (event.code) {
+                KeyCode.W -> {
+                    tank.move(Direction.UP)
+                }
+                KeyCode.S -> {
+                    tank.move(Direction.DOWN)
+                }
+                KeyCode.A -> {
+                    tank.move(Direction.LEFT)
+                }
+                KeyCode.D -> {
+                    tank.move(Direction.RIGHT)
+                }
+                KeyCode.ENTER -> {
+                    //发射子弹
+                    val short = tank.short()
+                    views.add(short)
+                }
             }
         }
+
     }
 
     override fun onRefresh() {
         //业务逻辑
+        //检测是否销毁的物体
+        views.filter {
+            it is Destroyable
+        }.forEach {
+            if ((it as Destroyable).isDestroyable()) {
+                views.remove(it)
+
+                val destroy = it.showDestroy()
+                destroy?.let {
+                    views.addAll(destroy)
+                }
+            }
+        }
+        if (gameOver)
+            return
 
         //判断运动的物体和阻塞的物体是否发生碰撞
         //1.找到运动的物体
@@ -131,35 +153,30 @@ class GameWindow : Window(
         }.forEach {
             (it as AutoMovable).autoMove()
         }
-        //检测是否销毁的物体
-        views.filter {
-            it is Destroyable
-        }.forEach {
-            if ((it as Destroyable).isDestroyable()) {
-                views.remove(it)
-            }
-        }
+
         //检测具备攻击能力和被攻击能力的物体间是否发生碰撞
         //过滤出具备攻击能力的物体
         views.filter { it is Attackable }.forEach attackTag@{ attack ->
             attack as Attackable
             //过滤出具备受攻击能力的物体,攻击方的来源不可以是发射方
-            views.filter { (it is Sufferable) and (attack.owner != it) }.forEach sufferTag@{ suffer ->
-                //判断是否发生碰撞
-                suffer as Sufferable
-                if (attack.isCollision(suffer)) {
-                    //产生碰撞,找到碰撞者
-                    //通知我们对应的攻击者产生我们的碰撞
-                    attack.notifyAttack(suffer)
-                    //通知我们的被攻击者产生碰撞
-                    val sufferView: Array<View>? = suffer.notifySuffer(attack)
-                    sufferView?.let {
-                        //产生挨打的效果
-                        views.addAll(sufferView)
+            //攻击方如果也是受攻击方,是不可以打自己的
+            views.filter { (it is Sufferable) and (attack.owner != it) and (attack != it) }
+                .forEach sufferTag@{ suffer ->
+                    //判断是否发生碰撞
+                    suffer as Sufferable
+                    if (attack.isCollision(suffer)) {
+                        //产生碰撞,找到碰撞者
+                        //通知我们对应的攻击者产生我们的碰撞
+                        attack.notifyAttack(suffer)
+                        //通知我们的被攻击者产生碰撞
+                        val sufferView: Array<View>? = suffer.notifySuffer(attack)
+                        sufferView?.let {
+                            //产生挨打的效果
+                            views.addAll(sufferView)
+                        }
+                        return@sufferTag
                     }
-                    return@sufferTag
                 }
-            }
         }
 
         //检测自动射击
@@ -169,6 +186,11 @@ class GameWindow : Window(
             shot?.let {
                 views.add(shot)
             }
+        }
+
+        //检测游戏是否结束
+        if (views.filter { it is Camp }.isEmpty()) {
+            gameOver = true
         }
     }
 
