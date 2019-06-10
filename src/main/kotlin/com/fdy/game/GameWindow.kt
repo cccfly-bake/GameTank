@@ -26,6 +26,25 @@ class GameWindow : Window(
      * 游戏是否结束
      */
     private var gameOver: Boolean = false
+    /**
+     * 敌方的数量
+     */
+    private var enemyTotalSize = 3
+    /**
+     * 敌方坦克再界面上最多显示几个
+     */
+    private var enemyActivitySize = 1
+
+    /**
+     * 敌方出生地
+     */
+    private val enemyBornLocation = arrayListOf<Pair<Int, Int>>()
+
+    /**
+     * 出生地点下标
+     *
+     */
+    private var bornIndex = 0
 
     override fun onCreate() {
         //地图
@@ -45,7 +64,7 @@ class GameWindow : Window(
                     '水' -> views.add(Water(columnNum * Config.block, lineNum * Config.block))
                     '铁' -> views.add(Steel(columnNum * Config.block, lineNum * Config.block))
                     '草' -> views.add(Grass(columnNum * Config.block, lineNum * Config.block))
-                    '敌' -> views.add(Enemy(columnNum * Config.block, lineNum * Config.block))
+                    '敌' -> enemyBornLocation.add(Pair(columnNum * Config.block, lineNum * Config.block))
                 }
                 columnNum++
             }
@@ -71,7 +90,8 @@ class GameWindow : Window(
 
     override fun onKeyPressed(event: KeyEvent) {
         //根据案件wsad移动坦克   更改xy去移动坦克
-        if (!gameOver){
+        //如果游戏结束,不进行对应的逻辑判断
+        if (!gameOver) {
             when (event.code) {
                 KeyCode.W -> {
                     tank.move(Direction.UP)
@@ -103,7 +123,9 @@ class GameWindow : Window(
         }.forEach {
             if ((it as Destroyable).isDestroyable()) {
                 views.remove(it)
-
+                if (it is Enemy) {
+                    enemyTotalSize--
+                }
                 val destroy = it.showDestroy()
                 destroy?.let {
                     views.addAll(destroy)
@@ -189,8 +211,17 @@ class GameWindow : Window(
         }
 
         //检测游戏是否结束
-        if (views.filter { it is Camp }.isEmpty()) {
+        if ((views.none { it is Camp }) or (enemyTotalSize <= 0)) {
             gameOver = true
+        }
+
+        //检测敌方出生
+        //判断当前页面上敌方的数量,小于激活数量,出生
+        if ((enemyTotalSize > 0) and (views.filter { it is Enemy }.size < enemyActivitySize)) {
+            val index = bornIndex % enemyBornLocation.size
+            val pair = enemyBornLocation[index]
+            views.add(Enemy(pair.first, pair.second))
+            bornIndex++
         }
     }
 

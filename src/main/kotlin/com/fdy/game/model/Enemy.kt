@@ -17,6 +17,8 @@ import java.util.*
  */
 class Enemy(override var x: Int, override var y: Int) : Movable, AutoMovable,
     Blockable, AutoShot, Sufferable, Destroyable {
+
+
     override var blood: Int = 2
     override var currentDirection: Direction = Direction.DOWN
     override val speed: Int = 8
@@ -128,4 +130,7 @@ class Enemy(override var x: Int, override var y: Int) : Movable, AutoMovable,
 
     override fun isDestroyable(): Boolean = blood <= 0
 
+    override fun showDestroy(): Array<View>? {
+        return null
+    }
 }
