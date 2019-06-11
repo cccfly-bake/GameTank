@@ -6,7 +6,9 @@ import com.fdy.game.model.*
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import org.itheima.kotlin.game.core.Window
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 import java.util.concurrent.CopyOnWriteArrayList
 
 class GameWindow : Window(
@@ -49,9 +51,10 @@ class GameWindow : Window(
     override fun onCreate() {
         //地图
         //通过读文件的方式创建我们的地图
-        val file = File(javaClass.getResource("/map/1.txt").path)
+        val inputStream = javaClass.getResourceAsStream("/map/1.txt")
+        val reader = BufferedReader(InputStreamReader(inputStream, "UTF-8"))
         //读文件
-        val lines = file.readLines()
+        val lines = reader.readLines()
         //循环遍历行
         var lineNum = 0
         lines.forEach { line ->
